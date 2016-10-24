@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
-import org.camunda.bpm.engine.test.api.authorization.util.HistoricAuthorizationScenario;
+import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenarioWithCount;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,7 +49,7 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(authRule).around(testHelper);
 
   @Parameterized.Parameter
-  public HistoricAuthorizationScenario scenario;
+  public AuthorizationScenarioWithCount scenario;
 
   protected HistoryService historyService;
 
@@ -74,8 +74,8 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-        HistoricAuthorizationScenario.scenario()
-            .withHistoricInstances(1L)
+        AuthorizationScenarioWithCount.scenario()
+            .withCount(2L)
             .withAuthorizations(
                 grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
                 grant(Resources.PROCESS_DEFINITION, "Process_1", "userId", Permissions.READ_HISTORY, Permissions.DELETE_HISTORY),
@@ -84,8 +84,8 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
             .failsDueToRequired(
                 grant(Resources.PROCESS_DEFINITION, "Process_2", "userId", Permissions.DELETE_HISTORY)
             ),
-        HistoricAuthorizationScenario.scenario()
-            .withHistoricInstances(0L)
+        AuthorizationScenarioWithCount.scenario()
+            .withCount(0L)
             .withAuthorizations(
                 grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
                 grant(Resources.PROCESS_DEFINITION, "Process_1", "userId", Permissions.READ_HISTORY, Permissions.DELETE_HISTORY),
@@ -102,7 +102,7 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
     // then
     assertScenario();
 
-    assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(getScenario().getHistoricInstances()));
+    assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(getScenario().getCount()));
   }
 
   @Test
@@ -137,7 +137,7 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
   }
 
   @Override
-  public HistoricAuthorizationScenario getScenario() {
+  public AuthorizationScenarioWithCount getScenario() {
     return scenario;
   }
 

@@ -14,6 +14,7 @@ package org.camunda.bpm.engine;
 
 import java.sql.Connection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,6 +44,7 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 
 
@@ -805,6 +807,98 @@ public interface ManagementService {
    *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobRetries(String jobId, int retries);
+
+  /**
+   * Sets the number of retries that jobs have left.
+   *
+   * Whenever the JobExecutor fails to execute a job, this value is decremented.
+   * When it hits zero, the job is supposed to be dead and not retried again.
+   * In that case, this method can be used to increase the number of retries.
+   *
+   * @param jobIds ids of the jobs to modify, cannot be null.
+   * @param retries number of retries.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void setJobRetries(List<String> jobIds, int retries);
+
+  /**
+   * Sets the number of retries that jobs have left asynchronously.
+   *
+   * Whenever the JobExecutor fails to execute a job, this value is decremented.
+   * When it hits zero, the job is supposed to be dead and not retried again.
+   * In that case, this method can be used to increase the number of retries.
+   *
+   * @param jobIds ids of the jobs to modify, cannot be null.
+   * @param retries number of retries.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION},
+   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   */
+  Batch setJobRetriesAsync(List<String> jobIds, int retries);
+
+  /**
+   * Sets the number of retries that jobs have left asynchronously.
+   *
+   * Whenever the JobExecutor fails to execute a job, this value is decremented.
+   * When it hits zero, the job is supposed to be dead and not retried again.
+   * In that case, this method can be used to increase the number of retries.
+   *
+   * @param jobQuery query that identifies which jobs should be modified, cannot be null.
+   * @param retries number of retries.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION},
+   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   */
+  Batch setJobRetriesAsync(JobQuery jobQuery, int retries);
+
+  /**
+   * Sets the number of retries that jobs have left asynchronously.
+   *
+   * Whenever the JobExecutor fails to execute a job, this value is decremented.
+   * When it hits zero, the job is supposed to be dead and not retried again.
+   * In that case, this method can be used to increase the number of retries.
+   *
+   * Either jobIds or jobQuery has to be provided. If both are provided resulting list
+   * of affected jobs will contain jobs matching query as well as jobs defined in the list.
+   *
+   * @param jobIds ids of the jobs to modify.
+   * @param jobQuery query that identifies which jobs should be modified.
+   * @param retries number of retries.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION},
+   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   */
+  Batch setJobRetriesAsync(List<String> jobIds, JobQuery jobQuery, int retries);
+
+  /**
+   * Sets the number of retries that jobs have left asynchronously.
+   *
+   * Whenever the JobExecutor fails to execute a job, this value is decremented.
+   * When it hits zero, the job is supposed to be dead and not retried again.
+   * In that case, this method can be used to increase the number of retries.
+   *
+   * Either jobIds or jobQuery has to be provided. If both are provided resulting list
+   * of affected jobs will contain jobs matching query as well as jobs defined in the list.
+   *
+   * @param processInstanceIds ids of the process instances that for which jobs retries will be set
+   * @param query query that identifies process instances with jobs that have to be modified
+   * @param retries number of retries.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION},
+   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   */
+  Batch setJobRetriesAsync (List<String> processInstanceIds, ProcessInstanceQuery query, int retries);
 
   /**
    * <p>

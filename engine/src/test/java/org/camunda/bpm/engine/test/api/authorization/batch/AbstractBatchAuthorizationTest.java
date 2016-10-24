@@ -28,6 +28,8 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
 
+import java.util.List;
+
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 
 /**
@@ -86,14 +88,22 @@ public abstract class AbstractBatchAuthorizationTest {
       engineRule.getHistoryService().deleteHistoricBatch(
           historicBatch.getId());
     }
+    testCleanUp();
+  }
+
+  protected void testCleanUp() {
+
   }
 
   protected void executeSeedAndBatchJobs() {
-    engineRule.getManagementService().executeJob(
-        engineRule.getManagementService().createJobQuery().singleResult().getId());
+    Job job = engineRule.getManagementService().createJobQuery()
+        .jobDefinitionId(batch.getSeedJobDefinitionId())
+        .singleResult();
+    //seed job
+    managementService.executeJob(job.getId());
 
-    for (Job pending : engineRule.getManagementService().createJobQuery().list()) {
-      engineRule.getManagementService().executeJob(pending.getId());
+    for (Job pending : managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list()) {
+      managementService.executeJob(pending.getId());
     }
   }
 
